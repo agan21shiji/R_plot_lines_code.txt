@@ -1,0 +1,41 @@
+library(ggplot2)
+
+#set the directory
+getwd()
+setwd('~/Desktop/test')
+
+#load csv file
+SEAP <- read.csv(file.choose(), header=T, sep=',')
+#assign another variable to get propotional value
+TAAR14d_D3.32A <- SEAP$TAAR14d.D3.32A/100000
+TAAR14d_D5.42A <- SEAP$TAAR14d.D5.42A/100000
+TAAR14d_D3.32A_SEM <- SEAP$X14d.D3.32A.SEM/100000
+TAAR14d_D5.42A_SEM <- SEAP$X14d.D5.42A.SEM/100000
+#assign the range of y axis
+y_range <- range(0,TAAR14d_D3.32A,TAAR14d_D5.42A)
+X <- c(1:10)
+#ggplot2
+#create a dataframe
+df <- cbind(X, TAAR14d_D3.32A,TAAR14d_D5.42A)
+df <- data.frame(df)
+
+pdf( "SEAP_ggplot.pdf", width=4.5, height=4, useDingbats=FALSE )
+ggplot(df, aes(x=X)) +
+  scale_shape_identity() +
+  scale_colour_identity() +
+  scale_fill_identity() +
+  geom_line(aes(y = TAAR14d_D3.32A, colour = "blue", linetype='solid',size=0.2)) +
+  geom_line(aes(y = TAAR14d_D5.42A, colour = "red",linetype='dashed',size=0.2)) +
+  geom_errorbar(aes(ymin= TAAR14d_D3.32A - TAAR14d_D3.32A_SEM, ymax=TAAR14d_D3.32A + TAAR14d_D3.32A_SEM), width=0.5, colour='blue') +
+  geom_errorbar(aes(ymin= TAAR14d_D5.42A - TAAR14d_D5.42A_SEM, ymax=TAAR14d_D5.42A + TAAR14d_D5.42A_SEM), width=0.5, colour='red') +
+  geom_point(aes(y = TAAR14d_D3.32A, colour = "blue", size=0.3,shape=21,fill='blue')) +
+  geom_point(aes(y = TAAR14d_D5.42A, colour = "red", size=0.3,shape=22,fill='red')) +
+  xlab("concentration") + ylab("SEAP activity") + ggtitle("TAAR14d and mutatants") +
+  xlim(1,10.5) + ylim(-1,25) +
+  #theme_bw() will get rid of the background
+  theme_bw() + 
+  #remove grid lines and border lines in background
+  theme(panel.border = element_blank(), panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) 
+
+dev.off()
